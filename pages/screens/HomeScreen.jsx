@@ -6,16 +6,19 @@ const HomeScreen = () => {
   const [country, setCountry] = useState("India");
   const [error, setError] = useState("");
   const [data, setData] = useState(null);
+  const [isLoading, setisLoading] = useState(false);
   const header = {
     "X-Api-Key": "X4e3pjUrUbjg1QqWzGIeTw==o21cSWFtdu6hy3vi",
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setisLoading(true);
 
     // Perform validation
     if (!city.trim()) {
       setError("City name is required.");
+      setisLoading(false);
       return;
     }
 
@@ -28,22 +31,31 @@ const HomeScreen = () => {
         }
       )
       .then((response) => {
-        setData(response.data?.[0]);
-        console.log(response.data);
+        if (response.data?.length > 0) {
+          setData(response.data[0]);
+          setError("");
+        } else {
+          setError("Please enter a valid city name or country name.");
+        }
       })
       .catch((err) => {
-        console.log(err);
+        setError(
+          "An error occurred while fetching data. Please try again later."
+        );
+      })
+      .finally(() => {
+        setisLoading(false);
       });
-    // Reset the error message and clear the form
-    setError("");
+
+    // Reset the form
     setCity("");
     setCountry("India");
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
       <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
         onSubmit={handleSubmit}
       >
         <div className="mb-4">
@@ -83,18 +95,43 @@ const HomeScreen = () => {
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
+            disabled={isLoading}
           >
-            Submit
+            {isLoading ? "Loading..." : "Submit"}
           </button>
         </div>
       </form>
 
       {data && (
-        <div>
-          <div>Name : {data.name}</div>
-          <div>Longitude : {data.longitude}</div>
-          <div>Latitude : {data.latitude}</div>
-          <div>State : {data.state}</div>
+        <div className="bg-white shadow-md rounded-lg p-8">
+          <div className="text-lg font-bold mb-4">Data Details</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-gray-700">Name:</div>
+              <div className="font-bold">{data.name}</div>
+            </div>
+            <div>
+              <div className="text-gray-700">State:</div>
+              <div className="font-bold">{data.state}</div>
+            </div>
+            <div>
+              <div className="text-gray-700">Longitude:</div>
+              <div className="font-bold">{data.longitude}</div>
+            </div>
+            <div>
+              <div className="text-gray-700">Latitude:</div>
+              <div className="font-bold">{data.latitude}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      {data == null && (
+        <div className="bg-white shadow-md rounded-lg p-8">
+          <div>
+            <div className="text-gray-700">
+              Please enter a valid city and country
+            </div>
+          </div>
         </div>
       )}
     </div>
