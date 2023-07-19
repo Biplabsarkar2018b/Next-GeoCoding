@@ -28,7 +28,7 @@ const HomeScreen = () => {
         }
       )
       .then((response) => {
-        // setData(response.data)
+        setData(response.data?.[0]);
         console.log(response.data);
       })
       .catch((err) => {
@@ -88,6 +88,15 @@ const HomeScreen = () => {
           </button>
         </div>
       </form>
+
+      {data && (
+        <div>
+          <div>Name : {data.name}</div>
+          <div>Longitude : {data.longitude}</div>
+          <div>Latitude : {data.latitude}</div>
+          <div>State : {data.state}</div>
+        </div>
+      )}
     </div>
   );
 };
